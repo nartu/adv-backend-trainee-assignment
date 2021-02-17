@@ -21,7 +21,7 @@ class Db:
         except Exception as e:
             raise e
 
-    def execute(self,sql=''):
+    def execute(self,sql='',force_answer=False,force_commit=False):
         # open, execute and close cursor
         # return dict: count of rows and list of tuples
         try:
@@ -30,16 +30,20 @@ class Db:
             with conn.cursor() as cur:
                 sql = sql.strip()
                 cur.execute(sql)
+                answer['force_answer'] = force_answer
+                answer['commit'] = True
                 answer['rows'] = cur.rowcount
-                if (sql.lower().find("select",0,6) != -1 or
+                if (force_answer or
+                    sql.lower().find("select",0,6) != -1 or
                     sql.lower().find("show",0,4) != -1):
                     answer['psql_answer'] = \
                     [tuple(map(lambda x: x.strip() if type(x) is str else x,row))
                     for row in cur.fetchall()]
-                else:
+                    answer['commit'] = force_commit
+                if answer['commit']:
                     if cur.rowcount > 0:
                         conn.commit()
-                        print('commit!')
+                        # print('commit!')
                 return answer
         except psycopg2.OperationalError as e:
             print("DB connection error: " + e.__class__.__name__)
@@ -95,7 +99,7 @@ def main():
     db = Db()
     print(db.connect())
     sql1 = '''
-    update test_m set name='Товар 666' where id = '393c710c-b169-48b8-837f-47ef8054c55bw';
+    update test_m set name='Товар 666' where id = '393c710c-b169-48b8-837f-47ef8054c55b';
     '''
     sql2 = '''
     select * from test_m  where id = '393c710c-b169-48b8-837f-47ef8054c55b'
@@ -103,7 +107,17 @@ def main():
     sql3 = '''
     show config_file;
     '''
-    print(db.execute(sql1))
+    sql4 = '''
+    WITH last AS
+	(select max(timestamp) from test_m)
+	select * from last;
+    '''
+    sql5 = '''
+    WITH last AS
+	(select max(created_at) from ads_main)
+	select * from last;
+    '''
+    print(db.execute(sql5,force_answer=True))
     print(db.close())
 
 
