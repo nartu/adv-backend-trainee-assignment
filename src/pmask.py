@@ -1,9 +1,8 @@
-from pydantic import BaseModel, ValidationError, validator, HttpUrl
+from pydantic import BaseModel, ValidationError, validator, HttpUrl, Field
 from typing import Optional, List, Dict
-from utils import db_create_ad
+from uuid import UUID
 
-error = {}
-
+# error = {}
 class Image(BaseModel):
     url: HttpUrl
     # name: str
@@ -34,26 +33,15 @@ class NewAd(BaseModel):
             raise ValueError(f'must be maximum 3 images')
         return v
 
+class GetOneAd(BaseModel):
+    """Get ad from DB by id"""
+    id: UUID
+    addition_fields: Optional[List[str]] = Field([],alias='fields')
 
-
-def main():
-    i1 = Image(url='https://cdn.britannica.com/s:690x388,c:crop/98/94698-050-F64C03A6/African-savanna-elephant.jpg')
-    i2 = Image(url='https://cdn.britannica.com/s:690x388,c:crop/71/271-004-FC5E5FFB/Asian-elephant.jpg')
-    i3 = Image(url='https://cdn.britannica.com/s:690x388,c:crop/02/152302-050-1A984FCB/African-savanna-elephant.jpg')
-    p = NewAd(name='wqlw',description='test description',price=1,images=[i1,i2,i3])
-    p2 = NewAd(name='Night',description='test description',price=1)
-
-    # print(p.images[0].url)
-    # print(p.__fields_set__)
-    print(db_create_ad(p))
-
-if __name__ == '__main__':
-    main()
-
-
-# try:
-#     p = NewAd(name='wqlw',description='test description',price=1)
-#     print(p.dict())
-# except ValidationError:
-#     e.update({'any': 'something wrong'})
-# print(error)
+    @validator('addition_fields')
+    def fields_available(cls, v, field):
+        available_fields = ["photo","description"]
+        available_fields_str = ", ".join(available_fields)
+        if len([item for item in v if item not in available_fields])>0:
+            raise ValueError(f"wrong fields, possible values of fields: {available_fields_str}")
+        return v

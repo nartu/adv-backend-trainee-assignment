@@ -1,7 +1,8 @@
 from typing import List, Dict
 from db import Db
+from pmask import NewAd, GetOneAd
 
-def db_create_ad(post_data) -> str:
+def db_create_ad(post_data:NewAd) -> str:
     p = post_data
     sql_return_last_id = ''
     if 'images' in p.__fields_set__ and len(p.images)>0:
@@ -37,16 +38,22 @@ def db_create_ad(post_data) -> str:
     res = sql
     return bd_res['psql_answer'][0][0]
 
-def db_get_ad_by_id(id:str = 'bb432975-4e1b-4db5-86c9-0d37e04630e7',fields:List=[]) -> Dict:
+def db_get_ad_by_id(ad:GetOneAd) -> Dict:
     ''' id: uuid, table ads_main + photo from ads_photo '''
+
+    id = ad.id
+    # id = 'bb432975-4e1b-4db5-86c9-0d37e04630e7'
+
+    fields = ad.addition_fields
 
     result = {}
 
-    # if field off (empty list), sql query additions
+    # if fields off (empty list), sql query additions
     # description
     description = ''
     # photo
-    photo, group_by_or_limit = 'ph.photo_url','limit 1'
+    photo = 'ph.photo_url'
+    group_by_or_limit = 'limit 1'
 
     if('description' in fields):
         description = ', m.description'
@@ -54,7 +61,6 @@ def db_get_ad_by_id(id:str = 'bb432975-4e1b-4db5-86c9-0d37e04630e7',fields:List=
     if('photo' in fields):
         photo = 'array_agg(ph.photo_url)'
         group_by_or_limit = 'group by m.id'
-
 
     sql = f'''
     select m.name, m.price, {photo} {description} from ads_main as m
@@ -68,7 +74,7 @@ def db_get_ad_by_id(id:str = 'bb432975-4e1b-4db5-86c9-0d37e04630e7',fields:List=
     db.connect()
     bd_res = db.execute_one(sql)
     db.close()
-
+    return bd_res
     result = {
         'name': bd_res[0],
         'price': float(bd_res[1]),
@@ -81,14 +87,7 @@ def db_get_ad_by_id(id:str = 'bb432975-4e1b-4db5-86c9-0d37e04630e7',fields:List=
     return result
 
 def main():
-    # td1 = {'name': 'Wqlw', 'description': 'Test Description', 'price': 1.0, 'images': [{'url': HttpUrl('https://cdn.britannica.com/s:690x388,c:crop/98/94698-050-F64C03A6/African-savanna-elephant.jpg', scheme='https', host='cdn.britannica.com', tld='com', host_type='domain', path='/s:690x388,c:crop/98/94698-050-F64C03A6/African-savanna-elephant.jpg')}, {'url': HttpUrl('https://cdn.britannica.com/s:690x388,c:crop/71/271-004-FC5E5FFB/Asian-elephant.jpg', scheme='https', host='cdn.britannica.com', tld='com', host_type='domain', path='/s:690x388,c:crop/71/271-004-FC5E5FFB/Asian-elephant.jpg')}, {'url': HttpUrl('https://cdn.britannica.com/s:690x388,c:crop/02/152302-050-1A984FCB/African-savanna-elephant.jpg', scheme='https', host='cdn.britannica.com', tld='com', host_type='domain', path='/s:690x388,c:crop/02/152302-050-1A984FCB/African-savanna-elephant.jpg')}]}
-    # p = db_create_ad()
-    # print(p)
-
-    # id ex bd264c47-525f-488a-982e-638fa074c441 , bb432975-4e1b-4db5-86c9-0d37e04630e7
-    s = db_get_ad_by_id('bb432975-4e1b-4db5-86c9-0d37e04630e7',fields=['description'])
-    # s = db_get_ad_by_id('bb432975-4e1b-4db5-86c9-0d37e04630e7')
-    print(s.items())
+    pass
 
 if __name__ == '__main__':
     main()

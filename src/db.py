@@ -58,11 +58,17 @@ class Db:
             conn = self.connect()
             with conn.cursor() as cur:
                 cur.execute(sql)
-                return tuple(map(lambda x: x.strip() if type(x) is str else x,cur.fetchone()))
+                cur_result = cur.fetchone()
         except psycopg2.OperationalError as e:
             print("DB connection error: " + e.__class__.__name__)
+            raise e
         except Exception as e:
             print("DB inner error: " + e.__class__.__name__)
+            raise e
+            
+        if cur_result:
+            return tuple(map(lambda x: x.strip() if type(x) is str else x,cur_result))
+        return None
 
     def close(self):
         try:
