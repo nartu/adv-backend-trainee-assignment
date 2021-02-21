@@ -1,22 +1,28 @@
-from utils import db_create_ad, db_get_ad_by_id
-from pmask import NewAd, Image, GetOneAd
+from utils import db_create_ad, db_get_ad_by_id, db_get_ads_list
+from pmask import NewAd, Image, GetOneAd, GetListAds
 import uuid
 from pydantic.error_wrappers import ValidationError
 
 def main():
-    id_uuid = uuid.UUID('{bb432975-4e1b-4db5-86c9-0d37e04630e7}')
+    l = GetListAds(order={'price': 'desc', 'created_at': 'desc'})
+    print(l)
+    # print(db_get_ads_list(l))
+    print(*db_get_ads_list(l), sep='\n')
 
-    a = GetOneAd(id='3fa85f64-5717-4562-b3fc-2c963f66afa6') # not exitst
-    b = GetOneAd(id='bb432975-4e1b-4db5-86c9-0d37e04630e7',fields=["photo", "description"])
-    c = GetOneAd(id='bb432975-4e1b-4db5-86c9-0d37e04630e7')
-
-    print(db_get_ad_by_id(a))
-    print(db_get_ad_by_id(b))
-    try:
-        print(GetOneAd(id='bb432975-4e1b-4db5-86c9-0d37e04630e700'))
-    except ValidationError as e:
-        print(e.errors()[0]['loc'][0])
-        print(dir(e))
+    # id_uuid = uuid.UUID('{bb432975-4e1b-4db5-86c9-0d37e04630e7}')
+    #
+    # a = GetOneAd(id='3fa85f64-5717-4562-b3fc-2c963f66afa6') # not exitst
+    # b = GetOneAd(id='bb432975-4e1b-4db5-86c9-0d37e04630e7',fields=["photo", "description"])
+    # c = GetOneAd(id='3d379544-3f50-45bb-be73-c34fafb8a1bb')
+    #
+    # print(db_get_ad_by_id(a))
+    # print(db_get_ad_by_id(b))
+    # print(db_get_ad_by_id(c))
+    # try:
+    #     print(GetOneAd(id='bb432975-4e1b-4db5-86c9-0d37e04630e700'))
+    # except ValidationError as e:
+    #     print(e.errors())
+    #     print(dir(e))
 
     # print(a)
 
@@ -28,9 +34,9 @@ def main():
 
     # print(p.images[0].url)
     # print(p.__fields_set__)
-    print(db_create_ad(p))
+    # print(db_create_ad(p))
 
-    print(uuid.UUID('{00010203-0405-0607-0809-0a0b0c0d0e0f}'))
+    # print(uuid.UUID('{00010203-0405-0607-0809-0a0b0c0d0e0f}'))
 
 if __name__ == '__main__':
     main()

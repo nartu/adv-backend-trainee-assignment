@@ -6,8 +6,8 @@ sys.path.insert(0,currentdir)
 from typing import Optional, List
 from fastapi import FastAPI, Query, Path, HTTPException
 from pydantic import BaseModel, ValidationError
-from pmask import NewAd, GetOneAd
-from utils import db_create_ad, db_get_ad_by_id
+from pmask import NewAd, GetOneAd, GetListAds
+from utils import db_create_ad, db_get_ad_by_id, db_get_ads_list
 from pydantic.error_wrappers import ValidationError
 
 # class NewAd(BaseModel):
@@ -38,7 +38,7 @@ def detail_of_ad_or_404(ad:GetOneAd):
 
 @app.post("/ads/detail/{id}")
 async def detail_of_ad_post(ad:GetOneAd):
-    detail_of_ad_or_404(ad)
+    return detail_of_ad_or_404(ad)
 
 @app.get("/ads/detail/{id}")
 async def detail_of_ad_get(id:str, fields:Optional[str] = None):
@@ -46,6 +46,7 @@ async def detail_of_ad_get(id:str, fields:Optional[str] = None):
         fields = fields.split(',')
     else:
         fields = []
+
     try:
         ad = GetOneAd(id=id,fields=fields)
     except ValidationError as e:
@@ -55,3 +56,8 @@ async def detail_of_ad_get(id:str, fields:Optional[str] = None):
         raise HTTPException(status_code=422, detail=error)
 
     return detail_of_ad_or_404(ad)
+
+# list of ads
+@app.post("/ads/list/{page}")
+async def list_of_ads_post(ads:GetListAds):
+    return db_get_ads_list(ads)

@@ -45,3 +45,8 @@ class GetOneAd(BaseModel):
         if len([item for item in v if item not in available_fields])>0:
             raise ValueError(f"wrong fields, possible values of fields: {available_fields_str}")
         return v
+
+class GetListAds(BaseModel):
+    """Get list of all ads from DB per page + order by price, created_at"""
+    page: int = 1
+    order: Dict[str, str] = {'price': 'asc', 'created_at': 'asc'}
