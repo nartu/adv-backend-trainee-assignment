@@ -2,6 +2,9 @@ from typing import List, Dict
 from db import Db
 from pmask import NewAd, GetOneAd, GetListAds
 from settings import ITEM_PER_PAGE
+import os
+from urllib.parse import urljoin
+import math
 
 def db_create_ad(post_data:NewAd) -> str:
     p = post_data
@@ -89,11 +92,12 @@ def db_get_ad_by_id(ad:GetOneAd) -> Dict:
 
     return result
 
-def db_get_ads_list(ads:GetListAds) -> Dict:
+def db_get_ads_list(ads:GetListAds, base_url:str='') -> Dict:
     ''' ads/list?page=1 , all ads by paginator,
         ads:
             page: int,
             order: Dict={'price': 'asc', 'created_at': 'asc'}
+        base_url: for path to detail of ad, request.base_url
     '''
     page = ads.page
     order = ads.order
@@ -126,10 +130,42 @@ def db_get_ads_list(ads:GetListAds) -> Dict:
 
     db = Db()
     db.connect()
+
+    # total count of items and pages
+    # error 404 if page > total_pages (empty result from db)
+    total_items = db.execute_one("select sum(1) from ads_main;")[0]
+    total_pages = math.ceil(total_items/ITEM_PER_PAGE)
+    if page > total_pages:
+        db.close()
+        error = {"error":"404"}
+        return error
+
+    result = {
+        "total_items": total_items,
+        "total_pages": total_pages,
+        "current_page": page,
+    }
+
     db_res = db.execute(sql)
+
     db.close()
 
-    return db_res['psql_answer']
+    result.update({"data": []})
+    if len(db_res)>0:
+        for item in db_res['psql_answer']:
+            # http://example.com/ads/detail/{id}
+            id = item[0]
+            url_path = os.path.join('/','ads/detail', id)
+            url = urljoin(base_url, url_path)
+            result["data"].append({
+                "url": url,
+                "name": item[1],
+                "price": item[2],
+                "photo": item[3],
+            })
+
+    return result
+
 
 def main():
     # print(db_get_ads_list(14), sep='\n')

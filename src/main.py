@@ -4,7 +4,7 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 sys.path.insert(0,currentdir)
 
 from typing import Optional, List
-from fastapi import FastAPI, Query, Path, HTTPException
+from fastapi import FastAPI, Query, Path, HTTPException, Request
 from pydantic import BaseModel, ValidationError
 from pmask import NewAd, GetOneAd, GetListAds
 from utils import db_create_ad, db_get_ad_by_id, db_get_ads_list
@@ -59,5 +59,15 @@ async def detail_of_ad_get(id:str, fields:Optional[str] = None):
 
 # list of ads
 @app.post("/ads/list/{page}")
-async def list_of_ads_post(ads:GetListAds):
-    return db_get_ads_list(ads)
+async def list_of_ads_post(request: Request, ads:GetListAds):
+    res = db_get_ads_list(ads, str(request.base_url))
+    if res.get("error"):
+        raise HTTPException(status_code=404, detail="Not found")
+    return res
+
+@app.post("/test/")
+async def test_r(request: Request, ads:GetListAds):
+    print(dir(request))
+    return (str(request.base_url), ads)
+
+# print(dir(Request.base_url))

@@ -4,10 +4,10 @@ import uuid
 from pydantic.error_wrappers import ValidationError
 
 def main():
-    l = GetListAds(order={'price': 'desc', 'created_at': 'desc'})
+    l = GetListAds(page=15, order={'price': 'desc', 'created_at': 'desc'})
     print(l)
     # print(db_get_ads_list(l))
-    print(*db_get_ads_list(l), sep='\n')
+    print(db_get_ads_list(l,'http://127.0.0.1:8000/'), sep='\n')
 
     # id_uuid = uuid.UUID('{bb432975-4e1b-4db5-86c9-0d37e04630e7}')
     #
