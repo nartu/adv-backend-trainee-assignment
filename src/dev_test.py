@@ -5,9 +5,9 @@ from pydantic.error_wrappers import ValidationError
 
 def main():
     l = GetListAds(page=15, order={'price': 'desc', 'created_at': 'desc'})
-    print(l)
+    # print(l)
     # print(db_get_ads_list(l))
-    print(db_get_ads_list(l,'http://127.0.0.1:8000/'), sep='\n')
+    # print(db_get_ads_list(l,'http://127.0.0.1:8000/'), sep='\n')
 
     # id_uuid = uuid.UUID('{bb432975-4e1b-4db5-86c9-0d37e04630e7}')
     #
@@ -29,12 +29,12 @@ def main():
     i1 = Image(url='https://cdn.britannica.com/s:690x388,c:crop/98/94698-050-F64C03A6/African-savanna-elephant.jpg')
     i2 = Image(url='https://cdn.britannica.com/s:690x388,c:crop/71/271-004-FC5E5FFB/Asian-elephant.jpg')
     i3 = Image(url='https://cdn.britannica.com/s:690x388,c:crop/02/152302-050-1A984FCB/African-savanna-elephant.jpg')
-    p = NewAd(name='Duble name 333',description='Mau description 333',price=1,images=[i1,i2,i3])
+    p = NewAd(name='Write 444',description='Mau description 333',price=23.11,images=[i1])
     p2 = NewAd(name='Night',description='test description',price=1)
 
     # print(p.images[0].url)
     # print(p.__fields_set__)
-    # print(db_create_ad(p))
+    print(db_create_ad(p))
 
     # print(uuid.UUID('{00010203-0405-0607-0809-0a0b0c0d0e0f}'))
 

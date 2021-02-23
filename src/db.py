@@ -47,6 +47,7 @@ class Db:
                 return answer
         except psycopg2.OperationalError as e:
             print("DB connection error: " + e.__class__.__name__)
+            raise e
         except Exception as e:
             print("DB inner error: " + e.__class__.__name__)
             raise e
@@ -65,7 +66,7 @@ class Db:
         except Exception as e:
             print("DB inner error: " + e.__class__.__name__)
             raise e
-            
+
         if cur_result:
             return tuple(map(lambda x: x.strip() if type(x) is str else x,cur_result))
         return None

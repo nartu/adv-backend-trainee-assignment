@@ -8,6 +8,7 @@ import math
 
 def db_create_ad(post_data:NewAd) -> str:
     p = post_data
+    result = {"status": "fail"}
     sql_return_last_id = ''
     if 'images' in p.__fields_set__ and len(p.images)>0:
         sql_insert_image_values = ''
@@ -37,10 +38,16 @@ def db_create_ad(post_data:NewAd) -> str:
     '''
     db = Db()
     db.connect()
-    bd_res = db.execute(sql,force_answer=True,force_commit=True)
-    db.close()
-    res = sql
-    return bd_res['psql_answer'][0][0]
+    try:
+        bd_res = db.execute(sql,force_answer=True,force_commit=True)
+        result.update({"status": "ok", "id": bd_res['psql_answer'][0][0]})
+    except Exception as e:
+        result["detail"] = str(e.__class__.__name__)
+        # raise e
+    finally:
+        db.close()
+
+    return result
 
 def db_get_ad_by_id(ad:GetOneAd) -> Dict:
     ''' id: uuid, table ads_main + photo from ads_photo '''
