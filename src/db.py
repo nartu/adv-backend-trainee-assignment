@@ -4,7 +4,7 @@ from configparser import ConfigParser
 import psycopg2
 
 class Db:
-    """docstring for Db."""
+    """psql connection"""
 
     def __init__(self, config=DB_CONNECT_CONFIG):
         super(Db, self).__init__()
@@ -26,6 +26,7 @@ class Db:
         # return dict: count of rows and list of tuples
         try:
             conn = self.connect()
+            # print(conn)
             answer = {}
             with conn.cursor() as cur:
                 sql = sql.strip()
@@ -57,6 +58,7 @@ class Db:
         # return tuple
         try:
             conn = self.connect()
+            # print(conn)
             with conn.cursor() as cur:
                 cur.execute(sql)
                 cur_result = cur.fetchone()
@@ -100,33 +102,8 @@ class Db:
         return db
 
 
-
-
 def main():
-    db = Db()
-    print(db.connect())
-    sql1 = '''
-    update test_m set name='Товар 666' where id = '393c710c-b169-48b8-837f-47ef8054c55b';
-    '''
-    sql2 = '''
-    select * from test_m  where id = '393c710c-b169-48b8-837f-47ef8054c55b'
-    '''
-    sql3 = '''
-    show config_file;
-    '''
-    sql4 = '''
-    WITH last AS
-	(select max(timestamp) from test_m)
-	select * from last;
-    '''
-    sql5 = '''
-    WITH last AS
-	(select max(created_at) from ads_main)
-	select * from last;
-    '''
-    print(db.execute(sql5,force_answer=True))
-    print(db.close())
-
+     pass
 
 if __name__ == '__main__':
     main()

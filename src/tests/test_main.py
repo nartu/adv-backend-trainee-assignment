@@ -121,8 +121,8 @@ def test_ads_create_fail_images():
 def test_ads_detail_post(addition_params, response_body_keys_ar, response_status):
     global id
     r = client.post("/ads/detail", json={"id":id,**addition_params})
-    print(r.json().keys())
-    print(r.url)
+    # print(r.json().keys())
+    # print(r.url)
     assert r.status_code == response_status
     assert list(r.json().keys()) == response_body_keys_ar
 
@@ -144,7 +144,7 @@ def test_ads_list_post():
     assert r.status_code == 200
     total_pages = r.json().get("total_pages")
     total_items = r.json().get("total_items")
-        
+
     # paginator and order price asc (by default: {'price': 'asc', 'created_at': 'asc'})
     previous = 0
     for page in range(1,total_pages+1):
