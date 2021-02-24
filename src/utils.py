@@ -162,10 +162,16 @@ def db_get_ads_list(ads:GetListAds, base_url:str='') -> Dict:
         for item in db_res['psql_answer']:
             # http://example.com/ads/detail/{id}
             id = item[0]
-            url_path = os.path.join('/','ads/detail', id)
-            url = urljoin(base_url, url_path)
+            if base_url:
+                url_path = os.path.join('/','ads/detail', id)
+                url = urljoin(base_url, url_path)
+                id_k = "url"    # from get
+                id_v = url
+            else:
+                id_k = "id"     # for post
+                id_v = id
             result["data"].append({
-                "url": url,
+                id_k: id_v,
                 "name": item[1],
                 "price": item[2],
                 "photo": item[3],

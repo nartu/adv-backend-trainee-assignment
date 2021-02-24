@@ -3,7 +3,6 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 # parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,currentdir)
 
-print(sys.path)
 from typing import Optional, List
 from fastapi import FastAPI, Query, Path, HTTPException, Request, status
 from fastapi.responses import JSONResponse
@@ -24,7 +23,7 @@ async def root():
     return {"message": "Ads API test app"}
 
 # put new ad into bd
-@app.post("/ads/create/", status_code=status.HTTP_201_CREATED,
+@app.post("/ads/create", status_code=status.HTTP_201_CREATED,
     responses={
         201: {
             "description": "Item have created in DB",
@@ -44,7 +43,6 @@ async def root():
         },
         # 422: {"model": NewAd, "description": "Validation error"}
     })
-
 async def create_ad(new:NewAd):
     res = db_create_ad(new)
     if res["status"] == "fail":
@@ -58,9 +56,9 @@ def detail_of_ad_or_404(ad:GetOneAd):
     if db_response:
         return db_response
     else:
-        raise HTTPException(status_code=404, detail="Not found")
+        raise HTTPException(status_code=404, detail="Not found ad with this ID")
 
-@app.post("/ads/detail/{id}")
+@app.post("/ads/detail")
 async def detail_of_ad_post(ad:GetOneAd):
     return detail_of_ad_or_404(ad)
 
@@ -82,9 +80,9 @@ async def detail_of_ad_get(id:str, fields:Optional[str] = None):
     return detail_of_ad_or_404(ad)
 
 # list of ads
-@app.post("/ads/list/{page}")
+@app.post("/ads/list")
 async def list_of_ads_post(request: Request, ads:GetListAds):
-    res = db_get_ads_list(ads, str(request.base_url))
+    res = db_get_ads_list(ads)
     if res.get("error"):
         raise HTTPException(status_code=404, detail="Not found")
     return res
@@ -100,10 +98,3 @@ async def list_of_ads_get(request: Request, page:int=1):
     if res.get("error"):
         raise HTTPException(status_code=404, detail="Not found")
     return res
-
-@app.post("/test/")
-async def test_r(request: Request, ads:GetListAds):
-    print(dir(request))
-    return (str(request.base_url), ads)
-
-# print(dir(Request.base_url))
