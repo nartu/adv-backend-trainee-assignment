@@ -10,8 +10,9 @@ from fastapi.encoders import jsonable_encoder
 import datetime
 import pytest
 from settings import ITEM_PER_PAGE
+import random
 
-client = TestClient(app, base_url="http://127.0.0.1:8000")
+client = TestClient(app, base_url="http://127.0.0.1:9000")
 
 # params
 params_get = [
@@ -48,7 +49,12 @@ def test_ads_create_success():
     j1 = {
       "name": f"Test product {name_suffix}",
       "description": f"Description of product {name_suffix}",
-      "price": 12
+      "price": int(name_suffix) * random.randint(1,800)/100,
+      "images": [
+          {"url":f"http://example.com/{name_suffix}_img1.jpg"},
+          {"url":f"http://example.com/{name_suffix}_img2.jpg"},
+          {"url":f"http://example.com/{name_suffix}_img3.jpg"}
+      ]
     }
     r = client.post("/ads/create", json=j1)
     assert r.json().get("status") == "ok"

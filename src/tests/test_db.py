@@ -56,7 +56,6 @@ def test_tables_schema(db_init):
     # must be columns
     # ads_main: id, name, description, price, created_at
     # ads_photo: id, main_id, photo_url
-
     sql = '''
     SELECT
        table_name,

@@ -83,8 +83,10 @@ async def detail_of_ad_get(id:str, fields:Optional[str] = None):
 @app.post("/ads/list")
 async def list_of_ads_post(request: Request, ads:GetListAds):
     res = db_get_ads_list(ads)
-    if res.get("error"):
+    if res.get("error") == "404":
         raise HTTPException(status_code=404, detail="Not found")
+    elif res.get("error") == "204":
+        return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
     return res
 
 @app.get("/ads/list/{page}")
@@ -95,6 +97,9 @@ async def list_of_ads_get(request: Request, page:int=1):
         raise HTTPException(status_code=422, detail=e.errors())
 
     res = db_get_ads_list(ads, str(request.base_url))
-    if res.get("error"):
+    if res.get("error" == "404"):
         raise HTTPException(status_code=404, detail="Not found")
+    elif res.get("error") == "204":
+        return JSONResponse(status_code=200, \
+            content={"detail": "No ads yet. Try /ads/create via POST"})
     return res

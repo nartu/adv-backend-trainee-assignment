@@ -141,6 +141,10 @@ def db_get_ads_list(ads:GetListAds, base_url:str='') -> Dict:
     # total count of items and pages
     # error 404 if page > total_pages (empty result from db)
     total_items = db.execute_one("select sum(1) from ads_main;")[0]
+    if not total_items:     # no data yet. response_status is HTTP_204_NO_CONTENT
+        db.close()
+        error = {"error":"204"}
+        return error
     total_pages = math.ceil(total_items/ITEM_PER_PAGE)
     if page > total_pages:
         db.close()
@@ -181,7 +185,6 @@ def db_get_ads_list(ads:GetListAds, base_url:str='') -> Dict:
 
 
 def main():
-    # print(db_get_ads_list(14), sep='\n')
     pass
 
 if __name__ == '__main__':
