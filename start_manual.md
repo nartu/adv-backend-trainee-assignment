@@ -4,9 +4,10 @@
 
 1. Клонировать репозиторий `git clone https://github.com/nartu/adv-backend-trainee-assignment.git`
 
-2. `docker-compose up -d`
+2. Запустить `docker-compose up -d`
 
 3. Запустить тесты:
+
   Сначала зайти в контейнер:
   ```
   docker exec -it app bash
@@ -25,6 +26,7 @@
   `pytest -v -k test_ads_create_success test_main.py`
 
 4. Автоматическая интерактивная документация от fastapi http://0.0.0.0:9000/docs
+  (возможна задержка между запуском и доступностью сервиса)
 
 5. Если не нужно сохранять данные БД, закомментить строчки в файле `docker-compose.yml`:
   ```
@@ -33,6 +35,8 @@
   # volumes:
   #   dbdata:
   ```
+
+6. Завершение работы `docker-compose down`
 
 
 ## Вручную
