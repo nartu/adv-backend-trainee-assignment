@@ -1,0 +1,30 @@
+version: "3.7"
+
+services:
+  app:
+    image: tiangolo/uvicorn-gunicorn-fastapi
+    container_name: app
+    ports:
+      - 9000:80
+    volumes:
+      - ./src:/app
+    networks:
+      - adv
+
+  db:
+    image: postgres
+    container_name: db
+    volumes:
+      - ./db_init:/docker-entrypoint-initdb.d
+      - dbdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: 777
+    networks:
+      - adv
+
+volumes:
+  dbdata:
+
+networks:
+  adv:
+    name: adv
